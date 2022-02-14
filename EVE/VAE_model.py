@@ -321,7 +321,7 @@ class VAE_model(nn.Module):
                     mutated_sequences_one_hot[i,j,k] = 1.0
 
         mutated_sequences_one_hot = torch.tensor(mutated_sequences_one_hot)
-        dataloader = torch.utils.data.DataLoader(mutated_sequences_one_hot, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
+        dataloader = torch.utils.data.DataLoader(mutated_sequences_one_hot, batch_size=batch_size, shuffle=False, pin_memory=True)
         prediction_matrix = torch.zeros((len(list_valid_mutations),num_samples))
 
         with torch.no_grad():
