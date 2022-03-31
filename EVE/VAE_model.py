@@ -331,7 +331,7 @@ class VAE_model(nn.Module):
 
         with torch.no_grad():
             for i, batch in enumerate(tqdm.tqdm(dataloader, 'Looping through mutation batches')):
-                x = batch.type(self.dtype).to(self.device)
+                x = batch.type(self.dtype).to("cpu")
                 with ThreadPoolExecutor(multiprocessing.cpu_count() - 2) as ex:
                     res = list(tqdm.tqdm(ex.map(self.all_likelihood_components, [x]*num_samples), total=num_samples))
                 for j, r in enumerate(res):
