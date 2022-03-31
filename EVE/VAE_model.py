@@ -38,17 +38,19 @@ class VAE_model(nn.Module):
         self.alphabet_size = data.alphabet_size
         self.Neff = data.Neff
 
-        encoder_parameters['seq_len'] = self.seq_len
-        encoder_parameters['alphabet_size'] = self.alphabet_size
-        decoder_parameters['seq_len'] = self.seq_len
-        decoder_parameters['alphabet_size'] = self.alphabet_size
+        self.encoder_parameters = encoder_parameters
+        self.decoder_parameters = decoder_parameters
+        self.encoder_parameters['seq_len'] = self.seq_len
+        self.encoder_parameters['alphabet_size'] = self.alphabet_size
+        self.decoder_parameters['seq_len'] = self.seq_len
+        self.decoder_parameters['alphabet_size'] = self.alphabet_size
         
-        self.encoder = VAE_encoder.VAE_MLP_encoder(params=encoder_parameters)
-        if decoder_parameters['bayesian_decoder']:
-            self.decoder = VAE_decoder.VAE_Bayesian_MLP_decoder(params=decoder_parameters)
+        self.encoder = VAE_encoder.VAE_MLP_encoder(params=self.encoder_parameters)
+        if self.decoder_parameters['bayesian_decoder']:
+            self.decoder = VAE_decoder.VAE_Bayesian_MLP_decoder(params=self.decoder_parameters)
         else:
-            self.decoder = VAE_decoder.VAE_Standard_MLP_decoder(params=decoder_parameters)
-        self.logit_sparsity_p = decoder_parameters['logit_sparsity_p']
+            self.decoder = VAE_decoder.VAE_Standard_MLP_decoder(params=self.decoder_parameters)
+        self.logit_sparsity_p = self.decoder_parameters['logit_sparsity_p']
         
     def sample_latent(self, mu, log_var):
         """
@@ -233,8 +235,8 @@ class VAE_model(nn.Module):
 
             if training_step % training_parameters['save_model_params_freq']==0:
                 self.save(model_checkpoint=training_parameters['model_checkpoint_location']+os.sep+self.model_name+"_step_"+str(training_step),
-                            encoder_parameters=encoder_parameters,
-                            decoder_parameters=decoder_parameters,
+                            encoder_parameters=self.encoder_parameters,
+                            decoder_parameters=self.decoder_parameters,
                             training_parameters=training_parameters)
             
             if training_parameters['use_validation_set'] and training_step % training_parameters['validation_freq'] == 0:
@@ -251,8 +253,8 @@ class VAE_model(nn.Module):
                     best_val_loss = val_neg_ELBO
                     best_model_step_index = training_step
                     self.save(model_checkpoint=training_parameters['model_checkpoint_location']+os.sep+self.model_name+"_best",
-                                encoder_parameters=encoder_parameters,
-                                decoder_parameters=decoder_parameters,
+                                encoder_parameters=self.encoder_parameters,
+                                decoder_parameters=self.decoder_parameters,
                                 training_parameters=training_parameters)
                 self.train()
     
