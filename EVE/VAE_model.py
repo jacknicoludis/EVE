@@ -333,7 +333,7 @@ class VAE_model(nn.Module):
             for i, batch in enumerate(tqdm.tqdm(dataloader, 'Looping through mutation batches')):
                 x = batch.type(self.dtype).to(self.device)
                 with ThreadPoolExecutor(multiprocessing.cpu_count() - 2) as ex:
-                    res = list(tqdm(ex.map(self.all_likelihood_components, [x]*num_samples), total=num_samples))
+                    res = list(tqdm.tqdm(ex.map(self.all_likelihood_components, [x]*num_samples), total=num_samples))
                 for j, r in enumerate(res):
                     prediction_matrix[i * batch_size:i * batch_size + len(x), j] = r[0]
                 #for j in tqdm.tqdm(range(num_samples), 'Looping through number of samples for batch #: '+str(i+1)):
