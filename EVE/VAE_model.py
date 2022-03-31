@@ -331,15 +331,11 @@ class VAE_model(nn.Module):
 
         with torch.no_grad():
             for i, batch in enumerate(tqdm.tqdm(dataloader, 'Looping through mutation batches')):
-                x = batch.type(self.dtype).to("cpu")
-                with ThreadPoolExecutor(multiprocessing.cpu_count() - 2) as ex:
-                    res = list(tqdm.tqdm(ex.map(self.all_likelihood_components, [x]*num_samples), total=num_samples))
-                for j, r in enumerate(res):
-                    prediction_matrix[i * batch_size:i * batch_size + len(x), j] = r[0]
-                #for j in tqdm.tqdm(range(num_samples), 'Looping through number of samples for batch #: '+str(i+1)):
-                #    seq_predictions, _, _ = self.all_likelihood_components(x)
-                #    prediction_matrix[i*batch_size:i*batch_size+len(x),j] = seq_predictions
-                #tqdm.tqdm.write('\n')
+                x = batch.type(self.dtype).to(self.device)
+                for j in tqdm.tqdm(range(num_samples), 'Looping through number of samples for batch #: '+str(i+1)):
+                    seq_predictions, _, _ = self.all_likelihood_components(x)
+                    prediction_matrix[i*batch_size:i*batch_size+len(x),j] = seq_predictions
+                tqdm.tqdm.write('\n')
             mean_predictions = prediction_matrix.mean(dim=1, keepdim=False)
             std_predictions = prediction_matrix.std(dim=1, keepdim=False)
             delta_elbos = mean_predictions - mean_predictions[0]
